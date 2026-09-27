@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>N's Bridal & Fashion OS</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand" id="brandBlock">
+        <img id="brandLogo" class="brand-logo" src="assets/brand/logo.jpg" alt="Logo" />
+        <div>
+          <div class="brand-title" id="brandTitle">N's Bridal & Fashion</div>
+          <div class="brand-sub" id="brandSub">Boutique Business System</div>
+        </div>
+      </div>
+      <nav id="nav"></nav>
+      <div class="sidebar-footer">
+        <button id="exportBtn" class="secondary full">Export Backup</button>
+        <label class="secondary full file-label">Import Backup<input id="importFile" type="file" accept="application/json" hidden></label>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div><h1 id="pageTitle">Dashboard</h1><p id="pageSubtitle">Your boutique at a glance</p></div>
+        <div class="top-actions"><button id="seedBtn" class="secondary">Load Sample Data</button><button id="resetBtn" class="danger ghost">Reset Data</button></div>
+      </header>
+      <section id="content" class="content"></section>
+    </main>
+  </div>
+  <div id="loginOverlay" class="login-overlay hidden">
+    <div class="login-card">
+      <div class="hero-brand"><img src="assets/brand/logo.jpg" alt="logo"><div><h2 style="margin:0">N's Bridal & Fashion</h2><div class="muted">Staff Login</div></div></div>
+      <form id="loginForm" class="stack" style="margin-top:18px">
+        <div class="field"><label>Email</label><input class="input" type="email" name="email" required></div>
+        <div class="field"><label>Password</label><input class="input" type="password" name="password" required></div>
+        <div id="loginError" class="muted"></div><button class="primary">Sign In</button>
+      </form>
+      <div class="muted tiny" style="margin-top:12px">Login is enforced only after Supabase is configured. Until then, the app remains in local/demo mode.</div>
+    </div>
+  </div>
+  <div id="modal" class="modal hidden" aria-hidden="true"><div class="modal-card"><div class="modal-head"><h2 id="modalTitle">Modal</h2><button id="modalClose" class="icon-btn">×</button></div><div id="modalBody"></div></div></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+  <script src="config.js"></script><script src="cloud.js"></script><script src="app.js"></script><script src="auth.js"></script>
+</body>
+</html>
