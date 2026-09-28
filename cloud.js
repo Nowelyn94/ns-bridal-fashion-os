@@ -55,5 +55,11 @@
     if(error) throw error;
     return data||[];
   }
-  window.NSCloud={configured,client,signIn,signOut,currentUser,submitBooking,uploadInventoryImage,listBookingRequests,saveCloudRecord,fetchCloudTable};
+  async function listSocialMessages(){
+    if(!client) return [];
+    const {data,error}=await client.from('social_messages').select('*').order('received_at',{ascending:false}).limit(200);
+    if(error) throw error;
+    return data||[];
+  }
+  window.NSCloud={configured,client,signIn,signOut,currentUser,submitBooking,uploadInventoryImage,listBookingRequests,saveCloudRecord,fetchCloudTable,listSocialMessages};
 })();
