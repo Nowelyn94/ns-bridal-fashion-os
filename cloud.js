@@ -81,5 +81,28 @@
     if(error) throw error;
     return true;
   }
-  window.NSCloud={configured,client,signIn,signOut,currentUser,submitBooking,uploadInventoryImage,listBookingRequests,saveCloudRecord,fetchCloudTable,listSocialMessages,enrichSocialSender,replySocialMessage,deleteSocialMessage};
+  async function uploadMarketingImage(file){
+    if(!client) return null;
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+    const path=`posts/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const {error}=await client.storage.from('marketing-media').upload(path,file,{upsert:false});
+    if(error) throw error;
+    const {data}=client.storage.from('marketing-media').getPublicUrl(path);
+    return data.publicUrl;
+  }
+  async function getMetaStatus(){
+    if(!client) return null;
+    const {data,error}=await client.functions.invoke('meta-publish',{body:{action:'status'}});
+    if(error) throw error;
+    if(data?.error) throw new Error(data.error);
+    return data;
+  }
+  async function publishMetaPost(caption,image_url,platforms){
+    if(!client) throw new Error('Cloud connection required.');
+    const {data,error}=await client.functions.invoke('meta-publish',{body:{action:'publish',caption,image_url,platforms}});
+    if(error) throw error;
+    if(data?.error) throw new Error(data.error);
+    return data;
+  }
+  window.NSCloud={configured,client,signIn,signOut,currentUser,submitBooking,uploadInventoryImage,listBookingRequests,saveCloudRecord,fetchCloudTable,listSocialMessages,enrichSocialSender,replySocialMessage,deleteSocialMessage,uploadMarketingImage,getMetaStatus,publishMetaPost};
 })();
