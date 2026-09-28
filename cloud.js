@@ -81,14 +81,19 @@
     if(error) throw error;
     return true;
   }
-  async function uploadMarketingImage(file){
+  async function uploadMarketingMedia(file){
     if(!client) return null;
-    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
-    const path=`posts/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const {error}=await client.storage.from('marketing-media').upload(path,file,{upsert:false});
+    const ext=(file.name.split('.').pop()||(file.type?.startsWith('video/')?'mp4':'jpg')).toLowerCase();
+    const kind=file.type?.startsWith('video/')?'videos':'images';
+    const path=`${kind}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const {error}=await client.storage.from('marketing-media').upload(path,file,{upsert:false,contentType:file.type||undefined});
     if(error) throw error;
     const {data}=client.storage.from('marketing-media').getPublicUrl(path);
-    return data.publicUrl;
+    return {url:data.publicUrl,type:file.type?.startsWith('video/')?'video':'image'};
+  }
+  async function uploadMarketingImage(file){
+    const media=await uploadMarketingMedia(file);
+    return media?.url||null;
   }
   async function getMetaStatus(){
     if(!client) return null;
@@ -97,12 +102,12 @@
     if(data?.error) throw new Error(data.error);
     return data;
   }
-  async function publishMetaPost(caption,image_url,platforms){
+  async function publishMetaPost(caption,media_url,platforms,media_type){
     if(!client) throw new Error('Cloud connection required.');
-    const {data,error}=await client.functions.invoke('meta-publish',{body:{action:'publish',caption,image_url,platforms}});
+    const {data,error}=await client.functions.invoke('meta-publish',{body:{action:'publish',caption,media_url,media_type,platforms}});
     if(error) throw error;
     if(data?.error) throw new Error(data.error);
     return data;
   }
-  window.NSCloud={configured,client,signIn,signOut,currentUser,submitBooking,uploadInventoryImage,listBookingRequests,saveCloudRecord,fetchCloudTable,listSocialMessages,enrichSocialSender,replySocialMessage,deleteSocialMessage,uploadMarketingImage,getMetaStatus,publishMetaPost};
+  window.NSCloud={configured,client,signIn,signOut,currentUser,submitBooking,uploadInventoryImage,listBookingRequests,saveCloudRecord,fetchCloudTable,listSocialMessages,enrichSocialSender,replySocialMessage,deleteSocialMessage,uploadMarketingImage,uploadMarketingMedia,getMetaStatus,publishMetaPost};
 })();
