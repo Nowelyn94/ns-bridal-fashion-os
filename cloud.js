@@ -57,9 +57,29 @@
   }
   async function listSocialMessages(){
     if(!client) return [];
-    const {data,error}=await client.from('social_messages').select('*').order('received_at',{ascending:false}).limit(200);
+    const {data,error}=await client.from('social_messages').select('*').eq('direction','inbound').order('received_at',{ascending:false}).limit(200);
     if(error) throw error;
     return data||[];
   }
-  window.NSCloud={configured,client,signIn,signOut,currentUser,submitBooking,uploadInventoryImage,listBookingRequests,saveCloudRecord,fetchCloudTable,listSocialMessages};
+  async function enrichSocialSender(sender_id,platform){
+    if(!client||!sender_id) return null;
+    const {data,error}=await client.functions.invoke('meta-actions',{body:{action:'profile',sender_id,platform}});
+    if(error) throw error;
+    if(data?.error) throw new Error(data.error);
+    return data;
+  }
+  async function replySocialMessage(row_id,sender_id,platform,text){
+    if(!client) throw new Error('Cloud connection required.');
+    const {data,error}=await client.functions.invoke('meta-actions',{body:{action:'reply',row_id,sender_id,platform,text}});
+    if(error) throw error;
+    if(data?.error) throw new Error(data.error);
+    return data;
+  }
+  async function deleteSocialMessage(id){
+    if(!client) throw new Error('Cloud connection required.');
+    const {error}=await client.from('social_messages').delete().eq('id',id);
+    if(error) throw error;
+    return true;
+  }
+  window.NSCloud={configured,client,signIn,signOut,currentUser,submitBooking,uploadInventoryImage,listBookingRequests,saveCloudRecord,fetchCloudTable,listSocialMessages,enrichSocialSender,replySocialMessage,deleteSocialMessage};
 })();
